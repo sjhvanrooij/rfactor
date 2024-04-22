@@ -1,0 +1,137 @@
+AURORA analyses: 
+Defining the r factor for post-trauma resilience and its neural predictors 
+van Rooij et al Nature Mental Health
+
+Analyses were conducted in SPSS v.28.0
+
+Step 1: PCA  
+
+All 2-week and 6-month item-level clinical data from the AURORA study were imported in a long-form dataset, using the variable DATASET to indicate 2-weeks or 6-month data: DATASET=1, 6-month data; DATASET=2, 2-week data.
+Available data:
+- n=2772 with 2-week or 6-month item level data
+- n=2062 with 6-month item-level data
+- n=1835 with complete 6-month item-level data --> used for PCA
+
+PCA syntax
+FACTOR
+  /VARIABLES DisturbingMemories FeelingUpset AvoidReminders FeelingCutOff FeelingIrritable 
+    DifficultyConcentrate BadDreams RelivingEvent StrongPhysicalReactions AvoidStressExperience 
+    TroubleRemember NoOneCanBeTrusted BlamingSelf FeelingFear LossOfInterest LackPositiveEmotions 
+    TakingRisks Superalert FeelingJumpy SleepProblems Anxious WorryAboutThings TroubleRelax Tense 
+    NothingInterest Worthless NothingToLookForward Helpless Sad Failure Depressed Unhappy Hopeless 
+    DiffStayAwakeInDay SleepProbDiffGetThingsDone NumDaysAlcohol NumDaysNicotine FeelingRejected 
+    ActWithoutThinkUpset UnfinishedTasks ThinkThingsOver ThinkCarefully LoseControl 
+    ActWithoutThinkExcited SeeThingsThrough
+  /MISSING LISTWISE 
+  /ANALYSIS DisturbingMemories FeelingUpset AvoidReminders FeelingCutOff FeelingIrritable 
+    DifficultyConcentrate BadDreams RelivingEvent StrongPhysicalReactions AvoidStressExperience 
+    TroubleRemember NoOneCanBeTrusted BlamingSelf FeelingFear LossOfInterest LackPositiveEmotions 
+    TakingRisks Superalert FeelingJumpy SleepProblems Anxious WorryAboutThings TroubleRelax Tense 
+    NothingInterest Worthless NothingToLookForward Helpless Sad Failure Depressed Unhappy Hopeless 
+    DiffStayAwakeInDay SleepProbDiffGetThingsDone NumDaysAlcohol NumDaysNicotine FeelingRejected 
+    ActWithoutThinkUpset UnfinishedTasks ThinkThingsOver ThinkCarefully LoseControl 
+    ActWithoutThinkExcited SeeThingsThrough
+  /SELECT=DATASET(1)
+  /PRINT UNIVARIATE INITIAL EXTRACTION ROTATION
+  /FORMAT SORT
+  /PLOT EIGEN
+  /CRITERIA MINEIGEN(1) ITERATE(25)
+  /EXTRACTION PC
+  /CRITERIA ITERATE(25)
+  /ROTATION VARIMAX
+  /SAVE REG(ALL)
+  /METHOD=CORRELATION.
+
+Step 2: Static and dynamic factors 
+
+The resulting principal components (Eigenvalues >2) for dataset 1 (FAC1_6m; FAC2_6m; FAC3_6m) and dataset 2 (FAC1_2w; FAC2_2w; FAC3_2w) were exported to a wide-form dataset. The scores were multiplied by minus one to calculate static resilience scores for the r-factor, reminder acceptance, and behavioral control. Then dynamic resilience was calculated by subtracting the 2-week scores from the 6-month scores. 
+
+Syntax:
+COMPUTE rfactor_static=FAC1_6m *  - 1.
+COMPUTE reminderacceptance_static=FAC2_6m *  - 1.
+COMPUTE behavioralcontrol_static=FAC3_6m *  - 1.
+EXECUTE.
+
+COMPUTE rfactor_dynamic=rfactor_static - FAC1_2w.
+COMPUTE reminderacceptance_dynamic= reminderacceptance_static – FAC2_2w.
+COMPUTE behavioralcontrol_dynamic= behavioralcontrol_static – FAC3_2w.
+EXECUTE.
+
+Step 3: Demographics 
+
+Neuroimaging data [Contrast estimates for the three task paradigms for regions of interest (n=9)] were extracted, exported to SPSS and merged with the dataset. 
+
+Available data:
+- n=2772 – total sample r-factor analyses --> n=1835 in analyses
+- n=388 – total sample imaging (n=329 for inhibition, n=370 for threat processing, and n=325 for reward processing). Of these individuals with neuroimaging data, r-factor scores were available for total N=260 (n=215 for inhibition, n=249 for threat processing, and n=214 for reward processing). --> n=260 in analyses
+
+A variable was created for imaging data available yes/no. The demographics table for all participants with available data were included, separately for the complete (n=1835) and neuroimaging (n=260) dataset. 
+
+Syntax:
+FREQUENCIES VARIABLES=ED_GenderBirthCert ED_RaceEthCode ED_Marital ED_highestgrade ED_TraumaCode
+    WK2_EmploymentCode WK2_IncomeCode 
+  /ORDER=ANALYSIS.
+DESCRIPTIVES VARIABLES=ED_Age
+  /STATISTICS=MEAN STDDEV MIN MAX.
+
+Step 4: Exploring resilience scores
+
+a. Analyses were performed investigating the associations between the resilience scores and biological sex, age, childhood trauma levels and trait resilience.
+
+Syntax (biological sex):
+T-TEST GROUPS=ED_GenderBirthCert(1 2)
+  /MISSING=ANALYSIS
+  /VARIABLES=rfactor_static rfactor_dynamic reminderacceptance_dynamic reminderacceptance_static behavioralcontrol_dynamic behavioralcontrol_static.
+  /ES DISPLAY(TRUE)
+  /CRITERIA=CI(.95).
+
+Syntax (age):
+CORRELATIONS
+  /VARIABLES= rfactor_static rfactor_dynamic reminderacceptance_dynamic reminderacceptance_static behavioralcontrol_dynamic behavioralcontrol_static ED_age
+  /PRINT=TWOTAIL NOSIG FULL
+  /MISSING=PAIRWISE.
+
+Syntax (childhood trauma; CTQ):
+CORRELATIONS
+  /VARIABLES= rfactor_static rfactor_dynamic reminderacceptance_dynamic reminderacceptance_static behavioralcontrol_dynamic behavioralcontrol_static WK2_CTQSF_EmoAbu_RS WK2_CTQSF_PhyAbu_RS WK2_CTQSF_SexAbu_RS 
+    WK2_CTQSF_EmoNeg_RS WK2_CTQSF_PhyNeg_RS WK2_CTQSF_Total_RS Wk2_CTQ_abuse_tot Wk2_CTQ_neglect_tot
+  /PRINT=TWOTAIL NOSIG FULL
+  /MISSING=PAIRWISE.
+
+Syntax (trait resilience; CD-RISC):
+CORRELATIONS
+  /VARIABLES= rfactor_static rfactor_dynamic reminderacceptance_dynamic reminderacceptance_static behavioralcontrol_dynamic behavioralcontrol_static M6_CDRISC10_RS
+  /PRINT=TWOTAIL NOSIG FULL
+  /MISSING=PAIRWISE.
+
+b. The 2-week and 6-month scores were compared. 
+
+Syntax:
+T-TEST PAIRS= FAC1_2w FAC2_2w  FAC3_2w WITH rfactor_static reminderacceptance_static behavioralcontrol_static (PAIRED)
+  /ES DISPLAY(TRUE) STANDARDIZER(SD)
+  /CRITERIA=CI(.9500)
+  /MISSING=ANALYSIS.
+
+c. Resilience scores were compared between individuals in the imaging sample (n=260) and individuals not included in the imaging analyses (n=1575).
+
+Syntax:
+T-TEST GROUPS=imagingdata_avail(0 1)
+  /MISSING=ANALYSIS
+  /VARIABLES= rfactor_static rfactor_dynamic reminderacceptance_dynamic reminderacceptance_static behavioralcontrol_dynamic behavioralcontrol_static
+  /ES DISPLAY(TRUE)
+  /CRITERIA=CI(.95).
+
+Step 5: ROI analyses 
+
+Outliers per task who deviated >3SD from the mean were excluded (Go/NoGo task, n=2, faces task, n=9, card task, n=2).
+TASKoutliers SIDFacesPID ~= 122790 AND PID ~= 116651 AND PID ~= 112017 AND PID ~= 116651 AND PID ~= 113231 AND PID ~= 119308 AND PID ~= 116651 AND PID ~= 119308 AND PID ~= 111035 cardPID ~= 109586 AND PID ~= 100375 GNGPID ~= 115190 AND PID ~= 122657
+Correlation analyses with the resilience scores were performed including site as dummy variables. 
+
+Syntax:
+PARTIAL CORR
+  /VARIABLES= GNG_Hammers_LR_Hippocampus faces_CITI168_LR_Amyg faces_hammers_LR_Hippocampus faces_WFU_BA25 faces_ROI_BA32
+    card_binary_bilateral_OFC_HarvOx card_CITI168_NAcc card_CITI168_LR_Amyg GNG_vmPFC rfactor_globalstress_6m rfactor_static rfactor_dynamic reminderacceptance_dynamic reminderacceptance_static behavioralcontrol_dynamic behavioralcontrol_static BY DUMMY_WS DUMMY_Temple DUMMY_McLean DUMMY_WUSL
+  /SIGNIFICANCE=TWOTAIL
+  /MISSING=PAIRWISE.
+
+
